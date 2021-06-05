@@ -233,6 +233,7 @@ class MotionCorrect(object):
         """
         # TODO: Review the docs here, and also why we would ever return self
         #       from a method that is not a constructor
+        print("*********************")
         if self.min_mov is None:
             if self.gSig_filt is None:
                 # self.min_mov = np.array([cm.load(self.fname[0],

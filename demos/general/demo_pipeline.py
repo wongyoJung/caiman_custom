@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+
 try:
     cv2.setNumThreads(0)
 except:
@@ -46,6 +47,7 @@ from caiman.source_extraction.cnmf import cnmf as cnmf
 from caiman.source_extraction.cnmf import params as params
 from caiman.utils.utils import download_demo
 from caiman.summary_images import local_correlations_movie_offline
+from caiman.utils.custom import saveIndividuals
 
 # %%
 # Set up the logger (optional); change this if you like.
@@ -63,10 +65,15 @@ def main():
     pass  # For compatibility between running under Spyder and the CLI
 
 #%% Select file(s) to be processed (download if not present)
-    fnames = ['Sue_2x_3000_40_-46.tif']  # filename to be processed
-    if fnames[0] in ['Sue_2x_3000_40_-46.tif', 'demoMovie.tif']:
-        fnames = [download_demo(fnames[0])]
-
+    print("===============")
+    # fnames = ['Sue_2x_3000_40_-46.tif']  # filename to be processed
+    # if fnames[0] in ['Sue_2x_3000_40_-46.tif', 'demoMovie.tif']:
+    #     fnames = [download_demo(fnames[0])]
+    #fnames = "E:/2P_Kim/06012021 fasted SA-SO test/1-5/G1-5-Fasted-Lick-SA-Session1/G1-5_Fasted_SA_s1.tif"
+    fnames = "E:/2P_Kim/06012021 fasted SA-SO test/1-5/G1-5-Fasted-Lick-SO/G1-5_Fasted-SO.tif"
+    filename = fnames.split("/")[-1]
+    # fnames = "‪D:/twophoton/CaImAn/example_movies/test.tif"
+    print("video loaded")
 #%% First setup some parameters for data and motion correction
 
     # dataset dependent parameters
@@ -125,7 +132,7 @@ def main():
 
 # %% Run (piecewise-rigid motion) correction using NoRMCorre
     mc.motion_correct(save_movie=True)
-
+    print("motion correction ended")
 # %% compare with original movie
     if display_images:
         m_orig = cm.load_movie_chain(fnames)
@@ -159,11 +166,11 @@ def main():
     p = 1                    # order of the autoregressive system
     gnb = 2                  # number of global background components
     merge_thr = 0.85         # merging threshold, max correlation allowed
-    rf = 15
+    rf = 30
     # half-size of the patches in pixels. e.g., if rf=25, patches are 50x50
     stride_cnmf = 6          # amount of overlap between the patches in pixels
     K = 4                    # number of components per patch
-    gSig = [4, 4]            # expected half size of neurons in pixels
+    gSig = [7,7]            # expected half size of neurons in pixels
     # initialization method (if analyzing dendritic data using 'sparse_nmf')
     method_init = 'greedy_roi'
     ssub = 2                     # spatial subsampling during initialization
@@ -210,11 +217,12 @@ def main():
                                            dview=dview)
     Cn = Cns.max(axis=0)
     Cn[np.isnan(Cn)] = 0
-    cnm.estimates.plot_contours(img=Cn)
-    plt.title('Contour plots of found components')
+    # cnm.estimates.plot_contours(img=Cn)
+    # plt.title('Contour plots of found components')
+    # plt.savefig("contours of cells")
 #%% save results
     cnm.estimates.Cn = Cn
-    cnm.save(fname_new[:-5]+'_init.hdf5')
+    # cnm.save(fname_new[:-5]+'_init.hdf5')
 
 # %% RE-RUN seeded CNMF on accepted patches to refine and perform deconvolution
     cnm2 = cnm.refit(images, dview=dview)
@@ -237,26 +245,34 @@ def main():
     cnm2.estimates.evaluate_components(images, cnm2.params, dview=dview)
     # %% PLOT COMPONENTS
     cnm2.estimates.plot_contours(img=Cn, idx=cnm2.estimates.idx_components)
+    print(cnm2.estimates.idx_components)
+    plt.title('2')
 
+    plt.savefig("gooooooooooooood")
+    
     # %% VIEW TRACES (accepted and rejected)
-
-    if display_images:
-        cnm2.estimates.view_components(images, img=Cn,
-                                      idx=cnm2.estimates.idx_components)
-        cnm2.estimates.view_components(images, img=Cn,
-                                      idx=cnm2.estimates.idx_components_bad)
+    #if display_images:
+    #    cnm2.estimates.view_components(images, img=Cn,
+    #                                  idx=cnm2.estimates.idx_components)
+    #    cnm2.estimates.view_components(images, img=Cn,
+     #                                 idx=cnm2.estimates.idx_components_bad)
     #%% update object with selected components
     cnm2.estimates.select_components(use_object=True)
     #%% Extract DF/F values
     cnm2.estimates.detrend_df_f(quantileMin=8, frames_window=250)
 
+    cells = saveIndividuals(cnm2.estimates.coordinates,cnm2.estimates.C,filename)
     #%% Show final traces
-    cnm2.estimates.view_components(img=Cn)
+    cnm2.estimates.view_components(img=Cn,filename=filename)
+    plt.title('3')
+    plt.savefig("3")
+
+
     #%%
     cnm2.estimates.Cn = Cn
-    cnm2.save(cnm2.mmap_file[:-4] + 'hdf5')
+   # cnm2.save(cnm2.mmap_file[:-4] + 'hdf5')//
     #%% reconstruct denoised movie (press q to exit)
-    if display_images:
+    if True:
         cnm2.estimates.play_movie(images, q_max=99.9, gain_res=2,
                                   magnification=2,
                                   bpx=border_to_0,

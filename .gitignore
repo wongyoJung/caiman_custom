@@ -55,6 +55,9 @@ __pycache__/
 
 #movie tif
 *.tif
+*.png
+
+
 
 # Distribution / packaging
 *__LOG_*
@@ -76,6 +79,8 @@ wheels/
 .installed.cfg
 *.egg
 .vscode/
+demos/general/result
+demos/general/save
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

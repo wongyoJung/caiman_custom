@@ -309,7 +309,7 @@ class Estimates(object):
                                thr=thr, params=params, cmap=cmap)
         return self
 
-    def view_components(self, Yr=None, img=None, idx=None):
+    def view_components(self,filename, Yr=None, img=None, idx=None):
         """view spatial and temporal components interactively
 
         Args:
@@ -340,8 +340,10 @@ class Estimates(object):
             img = np.reshape(np.array(self.A.mean(axis=1)), self.dims, order='F')
 
         if idx is None:
-            caiman.utils.visualization.view_patches_bar(Yr, self.A, self.C,
-                    self.b, self.f, self.dims[0], self.dims[1], YrA=self.R, img=img)
+            # caiman.utils.visualization.view_patches_bar(Yr, self.A, self.C,
+            #         self.b, self.f, self.dims[0], self.dims[1], YrA=self.R, img=img)
+            caiman.utils.visualization.view_patches2(Yr, self.A, self.C,
+                     self.b, self.f, self.dims[0], self.dims[1], filename, YrA=self.R, img=img,)
         else:
             caiman.utils.visualization.view_patches_bar(Yr, self.A.tocsc()[:,idx],
                                                         self.C[idx], self.b, self.f,

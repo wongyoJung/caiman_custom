@@ -32,6 +32,7 @@ from typing import Dict
 from warnings import warn
 import holoviews as hv
 import functools as fct
+import os
 
 from ..base.rois import com
 from ..summary_images import local_correlations
@@ -84,7 +85,8 @@ def view_patches(Yr, A, C, b, f, d1, d2, YrA=None, secs=1):
 
     """
 
-    pl.ion()
+    # pl.ion()
+    pl.ioff()
     nr, T = C.shape
     nb = f.shape[0]
     A2 = A.copy()
@@ -105,6 +107,7 @@ def view_patches(Yr, A, C, b, f, d1, d2, YrA=None, secs=1):
     sys.stdout.flush()
     for i in range(nr + 1):
         if i < nr:
+            fig = pl.figure()
             ax1 = fig.add_subplot(2, 1, 1)
             pl.imshow(np.reshape(old_div(np.array(A[:, i]), nA2[i]),
                                  (d1, d2), order='F'), interpolation='None')
@@ -116,20 +119,94 @@ def view_patches(Yr, A, C, b, f, d1, d2, YrA=None, secs=1):
                 np.array(C[i, :])), 'r', linewidth=2)
             ax2.set_title('Temporal component ' + str(i + 1))
             ax2.legend(labels=['Filtered raw data', 'Inferred trace'])
-
+            pl.savefig("save/"+str(i)+"test.png")
+            pl.close(fig)
             if secs > 0:
                 pl.pause(secs)
+                
             else:
                 pl.waitforbuttonpress()
 
             fig.delaxes(ax2)
         else:
             ax1 = fig.add_subplot(2, 1, 1)
-            pl.imshow(bkgrnd[:, :, i - nr], interpolation='None')
+            # pl.imshow(bkgrnd[:, :, i - nr], interpolation='None')
             ax1.set_title('Spatial background ' + str(i - nr + 1))
             ax2 = fig.add_subplot(2, 1, 2)
             pl.plot(np.arange(T), np.squeeze(np.array(f[i - nr, :])))
             ax2.set_title('Temporal background ' + str(i - nr + 1))
+def view_patches2(Yr, A, C, b, f, d1, d2, filename, YrA=None, secs=1,img=None):
+    # pl.ion()
+    pl.ioff()
+    if 'csc_matrix' not in str(type(A)):
+        A = csc_matrix(A)
+
+    nr, T = C.shape
+    nb = 0 if f is None else f.shape[0]
+    nA2 = np.sqrt(np.array(A.power(2).sum(axis=0))).squeeze()
+
+    if YrA is None:
+        Y_r = spdiags(old_div(1, nA2), 0, nr, nr) * (A.T.dot(Yr) -
+                                                     (A.T.dot(b)).dot(f) - (A.T.dot(A)).dot(C)) + C
+    else:
+        Y_r = YrA + C
+
+    if img is None:
+        img = np.reshape(np.array(A.mean(axis=1)), (d1, d2), order='F')
+
+    for i in range(nr + 1):
+        if i < nr:
+            fig = pl.figure(figsize=(10, 10))
+
+            axcomp = pl.axes([0.05, 0.05, 0.9, 0.03])
+
+            ax1 = pl.axes([0.05, 0.55, 0.4, 0.4])
+            ax3 = pl.axes([0.55, 0.55, 0.4, 0.4])
+            ax2 = pl.axes([0.05, 0.1, 0.9, 0.4])
+
+            s_comp = Slider(axcomp, 'Component', 0, nr + nb - 1, valinit=0)
+            vmax = np.percentile(img, 95)
+##################################################
+            ax1.cla()
+            imgtmp = np.reshape(A[:, i].toarray(), (d1, d2), order='F')
+            ax1.imshow(imgtmp, interpolation='None', cmap=pl.cm.gray, vmax=np.max(imgtmp)*0.5)
+            ax1.set_title('Spatial component ' + str(i + 1))
+            ax1.axis('off')
+
+            ax2.cla()
+            ax2.plot(np.arange(T), Y_r[i], 'c', linewidth=3)
+            ax2.plot(np.arange(T), C[i], 'r', linewidth=2)
+            ax2.set_title('Temporal component ' + str(i + 1))
+            ax2.legend(labels=['Filtered raw data', 'Inferred trace'])
+
+            ax3.cla()
+            ax3.imshow(img, interpolation='None', cmap=pl.cm.gray, vmax=vmax)
+            imgtmp2 = imgtmp.copy()
+            imgtmp2[imgtmp2 == 0] = np.nan
+            ax3.imshow(imgtmp2, interpolation='None',
+                       alpha=0.5, cmap=pl.cm.hot)
+            ax3.axis('off')
+            # print(filename)
+            directory = "save/"+filename
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            pl.savefig(directory+"/"+str(i)+"test.png")
+            pl.close(fig)
+            if secs > 0:
+                pl.pause(secs)
+                
+            else:
+                pl.waitforbuttonpress()
+
+            # fig.delaxes(ax2)
+        else:
+            ax1 = fig.add_subplot(2, 1, 1)
+            # pl.imshow(bkgrnd[:, :, i - nr], interpolation='None')
+            ax1.set_title('Spatial background ' + str(i - nr + 1))
+            ax2 = fig.add_subplot(2, 1, 2)
+            pl.plot(np.arange(T), np.squeeze(np.array(f[i - nr, :])))
+            ax2.set_title('Temporal background ' + str(i - nr + 1))
+
 
 
 def nb_view_patches(Yr, A, C, b, f, d1, d2, YrA=None, image_neurons=None, thr=0.99, denoised_color=None, cmap='jet'):
