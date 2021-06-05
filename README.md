@@ -6,6 +6,16 @@ A Python toolbox for large scale **Ca**lcium **Im**aging data **An**alysis and b
 
 CaImAn implements a set of essential methods required in the analysis pipeline of large scale calcium imaging data. Fast and scalable algorithms are implemented for motion correction, source extraction, spike deconvolution, and component registration across multiple days. It is suitable for both two-photon and one-photon fluorescence microscopy data, and can be run in both batch and online modes. CaImAn also contains some routines for the analysis of behavior from video cameras. A list of features as well as relevant references can be found [here](https://caiman.readthedocs.io/en/latest/CaImAn_features_and_references.html).
 
+# CUSTOM
+1. firstlick.py
+2. demo_pipeline.py
+3. test.py --> ROI 검출
+4. mannually ROI 확인 -> final ROI
+5. final ROI로 deconvolution => 최종 데이터
+
+## TODO
+5번 및 1~3 자동화 (2021.06.05)
+
 ## Requirements
 
 Right now, CaImAn works and is supported on the following platforms:
@@ -133,3 +143,4 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
