@@ -20,6 +20,8 @@ from scipy.sparse import csc_matrix
 import pickle
 import os
 from caiman.utils.utils import download_demo
+from PIL import Image
+import cv2
 
 
 # %% load spatial components and correlation images for each session
@@ -33,14 +35,33 @@ from caiman.utils.utils import download_demo
 # print("####")
 # print(asdfasdf)
 
-CI = [ np.zeros((512, 512)), np.zeros((512, 512))]
 # xxx = np.load("testmulti/xxx.npy", allow_pickle=True)
-xxx= scipy.sparse.load_npz("ex.npz")
+#xIm = np.array(Image.open('E:/2P_Kim/06012021 fasted SA-SO test/G1-4/G1-4_Fasted-SA-Session-1/STD_G1-4_Fasted_SA-session1.jpg'))
+
+xIm = cv2.imread("E:/2P_Kim/06012021 fasted SA-SO test/G1-4/G1-4_Fasted-SA-Session-1/MAX_G1-4_Fasted_SA-session1.jpg")
+
+
+print(type(xIm))
+print(xIm.shape)
+
+
+xxx= scipy.sparse.load_npz("G1-4_Fasted_SO_s2.tif.npz")
+
+#yIm = np.array(Image.open('G1-4_Fasted_SO_s2.png').convert('L'))
+
+yyy = scipy.sparse.load_npz("G1-4_Fasted_SA-session1.tif.npz")
+
+CI = [np.zeros((512,512)), np.zeros((512,512))]
+
+
 
 print(xxx)
 print(scipy.sparse.isspmatrix_csc(xxx))
 print(type(xxx))
-A=[xxx,xxx]
+A=[xxx,yyy]
+
+plt.imshow(xIm)
+plt.savefig("testmulti/total.png")
 
 # A is a list where each entry is the matrix of the spatial components for each session
 # CI is a list where each entry is the correlation image for each session
@@ -89,9 +110,16 @@ masks_reg = np.reshape(A_reg, dims + (-1,), order='F').transpose(2, 0, 1)
 # %% first compare results from sessions 1 and 2 (Fig. 14b)
 # If you just have two sessions you can use the register_ROIs function
 print("registerended")
-# match_1 = extract_active_components(assign, [0], only=False)
-# match_2 = extract_active_components(assign, [1], only=False)
+match_1 = extract_active_components(assign, [0], only=False)
+match_2 = extract_active_components(assign, [1], only=False)
 match_12 = extract_active_components(assign, [0, 1], only=False)
+
+print("match 1   :  ",match_1.shape)
+print("match 2   :  ",match_2.shape)
+
+print("match12  :   ",match_12)
+
+print(match)
 
 cl = ['y', 'g', 'r']
 labels = ['Both Sessions', 'Session 1 (only)', 'Session 2 (only)']
@@ -100,6 +128,7 @@ id=0
 for mm in masks[0][match_12]:
     id=id+1
     if(id>0):
-        # plt.imshow(CI[N], vmin=lp, vmax=hp, cmap='gray')
+        plt.imshow(xIm, vmin=lp, vmax=hp, cmap='gray')
         plt.contour(norm_nrg(mm), levels=[0.95], colors='y', linewidths=1)
         plt.savefig("testmulti/"+str(id)+".png")
+

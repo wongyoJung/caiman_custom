@@ -67,7 +67,7 @@ def main():
 
 #%% Select file(s) to be processed (download if not present)
     print("===============")
-    fnames = "D:/twophoton/test/test.tif"
+    fnames = "E:/2P_Kim/06012021 fasted SA-SO test/G1-4/G1-4_Fasted-SA-Session-1/G1-4_Fasted_SA-session1.tif"
     filename = fnames.split("/")[-1]
     print("video loaded")
 #%% First setup some parameters for data and motion correction
@@ -260,9 +260,9 @@ def main():
     print("XXXXXXXXXXXXXXXXXXXXXXX")
     print(type(cnm2.estimates.A))
     # np.save("testmulti/xxx",cnm2.estimates.A)
-    scipy.io.mmwrite("test.mtx",  cnm2.estimates.A)
+    #scipy.io.mmwrite("test.mtx",  cnm2.estimates.A)
 
-    scipy.sparse.save_npz('ex.npz', cnm2.estimates.A)
+    scipy.sparse.save_npz(filename+'.npz', cnm2.estimates.A)
     print("XXXXXXXXXXXXXXXXXXXXXXX")
 
 
