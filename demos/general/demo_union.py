@@ -24,6 +24,7 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import scipy.sparse
 
 
 try:
@@ -66,14 +67,8 @@ def main():
 
 #%% Select file(s) to be processed (download if not present)
     print("===============")
-    # fnames = ['Sue_2x_3000_40_-46.tif']  # filename to be processed
-    # if fnames[0] in ['Sue_2x_3000_40_-46.tif', 'demoMovie.tif']:
-    #     fnames = [download_demo(fnames[0])]
-    #fnames = "E:/2P_Kim/06012021 fasted SA-SO test/1-5/G1-5-Fasted-Lick-SA-Session1/G1-5_Fasted_SA_s1.tif"
-    #fnames = "E:/2P_Kim/06012021 fasted SA-SO test/1-5/G1-5-Fasted-Lick-SO/G1-5_Fasted-SO.tif"
     fnames = "D:/twophoton/test/test.tif"
     filename = fnames.split("/")[-1]
-    # fnames = "‪D:/twophoton/CaImAn/example_movies/test.tif"
     print("video loaded")
 #%% First setup some parameters for data and motion correction
 
@@ -135,13 +130,13 @@ def main():
     mc.motion_correct(save_movie=True)
     print("motion correction ended")
 # %% compare with original movie
-    if display_images:
-        m_orig = cm.load_movie_chain(fnames)
-        m_els = cm.load(mc.mmap_file)
-        ds_ratio = 0.2
-        moviehandle = cm.concatenate([m_orig.resize(1, 1, ds_ratio) - mc.min_mov*mc.nonneg_movie,
-                                      m_els.resize(1, 1, ds_ratio)], axis=2)
-        moviehandle.play(fr=60, q_max=99.5, magnification=2)  # press q to exit
+    # if display_images:
+    #     m_orig = cm.load_movie_chain(fnames)
+    #     m_els = cm.load(mc.mmap_file)
+    #     ds_ratio = 0.2
+    #     moviehandle = cm.concatenate([m_orig.resize(1, 1, ds_ratio) - mc.min_mov*mc.nonneg_movie,
+    #                                   m_els.resize(1, 1, ds_ratio)], axis=2)
+    #     moviehandle.play(fr=60, q_max=99.5, magnification=2)  # press q to exit
 
 # %% MEMORY MAPPING
     border_to_0 = 0 if mc.border_nan == 'copy' else mc.border_to_0
@@ -246,16 +241,13 @@ def main():
     cnm2.estimates.plot_contours(img=Cn, idx=cnm2.estimates.idx_components)
     print(len(cnm2.estimates.idx_components))
     print(len(cnm2.estimates.C))
-
-    plt.title('2')
-    plt.savefig("gooooooooooooood")
     
     # %% VIEW TRACES (accepted and rejected)
     #if display_images:
     #    cnm2.estimates.view_components(images, img=Cn,
     #                                  idx=cnm2.estimates.idx_components)
     #    cnm2.estimates.view_components(images, img=Cn,
-     #                                 idx=cnm2.estimates.idx_components_bad)
+     #                                 idx=cnm2.estimates.idx_components_   bad)
     #%% update object with selected components
     cnm2.estimates.select_components(use_object=True)
     print("After select component   :",len(cnm2.estimates.C))
@@ -265,8 +257,14 @@ def main():
     cells = saveIndividuals(cnm2.estimates.coordinates,cnm2.estimates.C,filename)
     #%% Show final traces
     cnm2.estimates.view_components(img=Cn,filename=filename)
-    plt.title('3')
-    plt.savefig("3")
+    print("XXXXXXXXXXXXXXXXXXXXXXX")
+    print(type(cnm2.estimates.A))
+    # np.save("testmulti/xxx",cnm2.estimates.A)
+    scipy.io.mmwrite("test.mtx",  cnm2.estimates.A)
+
+    scipy.sparse.save_npz('ex.npz', cnm2.estimates.A)
+    print("XXXXXXXXXXXXXXXXXXXXXXX")
+
 
 
     #%%

@@ -86,6 +86,7 @@ for i, k in enumerate(data.items()):
         roi_obj = ROIFreehand(0, 0, 0, 0,xs,ys) # Make ROIRect object specifing top, left, bottom, right
         with ROIEncoder(roiname, roi_obj) as roi:
             roi.write()
+            
 cv2.imwrite("result/"+filename+"/total.png",image)
 cv2.imwrite("result/"+filename+"/overlap.png",imarray)
 

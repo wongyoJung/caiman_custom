@@ -24,7 +24,8 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
+from ROI2Binary import ROI2BIN
+from readMask import readmask
 
 try:
     cv2.setNumThreads(0)
@@ -64,15 +65,22 @@ logging.basicConfig(format=
 def main():
     pass  # For compatibility between running under Spyder and the CLI
 
-#%% Select file(s) to be processed (download if not present)
+    
+    
+    #%% OPEN ROIs
+    print("open ROIs")
+    ROIs = "D:/twophoton/CaImAn/demos/general/RoiSet.zip"
+    manualBin = ROI2BIN(ROIs)
+    print(type(manualBin))
+    # #%% Select file(s) to be processed (download if not present)
     print("===============")
     # fnames = ['Sue_2x_3000_40_-46.tif']  # filename to be processed
     # if fnames[0] in ['Sue_2x_3000_40_-46.tif', 'demoMovie.tif']:
     #     fnames = [download_demo(fnames[0])]
     #fnames = "E:/2P_Kim/06012021 fasted SA-SO test/1-5/G1-5-Fasted-Lick-SA-Session1/G1-5_Fasted_SA_s1.tif"
     #fnames = "E:/2P_Kim/06012021 fasted SA-SO test/1-5/G1-5-Fasted-Lick-SO/G1-5_Fasted-SO.tif"
-    fnames = "D:/twophoton/test/test.tif"
-    filename = fnames.split("/")[-1]
+    fnames = "E:/2P_Kim/20210610/Test/Image_001_001.tif"
+    filename = fnames.split("/")[-1]+"-2"
     # fnames = "‪D:/twophoton/CaImAn/example_movies/test.tif"
     print("video loaded")
 #%% First setup some parameters for data and motion correction
@@ -176,24 +184,51 @@ def main():
     method_init = 'greedy_roi'
     ssub = 2                     # spatial subsampling during initialization
     tsub = 2                     # temporal subsampling during intialization
-    # parameters for component evaluation
-    opts_dict = {'fnames': fnames,
-                 'p': p,
-                 'fr': fr,
-                 'nb': gnb,
-                 'rf': rf,
-                 'K': K,
-                 'gSig': gSig,
-                 'stride': stride_cnmf,
-                 'method_init': method_init,
-                 'rolling_sum': True,
-                 'merge_thr': merge_thr,
-                 'n_processes': n_processes,
-                 'only_init': True,
-                 'ssub': ssub,
-                 'tsub': tsub}
 
-    opts.change_params(params_dict=opts_dict)
+# dataset dependent parameters
+
+    # rf = None                   # half-size of the patches in pixels. Should be `None` when seeded CNMF is used.
+    # only_init = False
+    # # parameters for component evaluation
+    # opts_dict = {'fnames': fnames,
+    #              'p': p,
+    #              'fr': fr,
+    #              'nb': gnb,
+    #              'rf': rf,
+    #              'K': K,
+    #              'gSig': gSig,
+    #              'stride': stride_cnmf,
+    #              'method_init': method_init,
+    #              'only_init':only_init,
+    #              'rolling_sum': True,
+    #              'merge_thr': merge_thr,
+    #              'n_processes': n_processes,
+    #              'only_init': True,
+    #              'ssub': ssub,
+    #              'tsub': tsub}
+
+    # opts.change_params(params_dict=opts_dict)
+
+
+
+
+    rf = None                   # half-size of the patches in pixels. Should be `None` when seeded CNMF is used.
+    only_init = False           # has to be `False` when seeded CNMF is used
+    gSig = (7, 7)               # expected half size of neurons in pixels, very important for proper component detection
+
+# params object
+    opts_dict = {'fnames': fnames,
+                'decay_time': 0.4,
+                'p': 1,
+                'nb': 2,
+                'rf': rf,
+                'only_init': only_init,
+                'gSig': gSig,
+                'ssub': 1,
+                'tsub': 1,
+                'merge_thr': 0.85}
+
+    opts.change_params(opts_dict);
 # %% RUN CNMF ON PATCHES
     # First extract spatial and temporal components on patches and combine them
     # for this step deconvolution is turned off (p=0). If you want to have
@@ -201,7 +236,8 @@ def main():
     # nonzero value
 
     #opts.change_params({'p': 0})
-    cnm = cnmf.CNMF(n_processes, params=opts, dview=dview)
+    Ain = readmask('D:/twophoton/CaImAn/demos/general/rois')
+    cnm = cnmf.CNMF(n_processes, params=opts, dview=dview,Ain=Ain)
     cnm = cnm.fit(images)
 
 # %% ALTERNATE WAY TO RUN THE PIPELINE AT ONCE
@@ -222,9 +258,14 @@ def main():
 #%% save results
     cnm.estimates.Cn = Cn
     # cnm.save(fname_new[:-5]+'_init.hdf5')
-
 # %% RE-RUN seeded CNMF on accepted patches to refine and perform deconvolution
     cnm2 = cnm.refit(images, dview=dview)
+    # print("~~~~~~~~~~~~~~~~~~~~~~~~")
+    # print(cnm2.estimates.A)
+    # print(type(cnm2.estimates.A))
+
+    # print("~~~~~~~~~~~~~~~~~~~~~~~~")
+
     # %% COMPONENT EVALUATION
     # the components are evaluated in three ways:
     #   a) the shape of each component must be correlated with the data
@@ -244,6 +285,7 @@ def main():
     cnm2.estimates.evaluate_components(images, cnm2.params, dview=dview)
     # %% PLOT COMPONENTS
     cnm2.estimates.plot_contours(img=Cn, idx=cnm2.estimates.idx_components)
+
     print(len(cnm2.estimates.idx_components))
     print(len(cnm2.estimates.C))
 
@@ -259,11 +301,12 @@ def main():
     #%% update object with selected components
     cnm2.estimates.select_components(use_object=True)
     print("After select component   :",len(cnm2.estimates.C))
+
     #%% Extract DF/F values
     cnm2.estimates.detrend_df_f(quantileMin=8, frames_window=250)
 
     cells = saveIndividuals(cnm2.estimates.coordinates,cnm2.estimates.C,filename)
-    #%% Show final traces
+    # %% Show final traces
     cnm2.estimates.view_components(img=Cn,filename=filename)
     plt.title('3')
     plt.savefig("3")
