@@ -67,7 +67,7 @@ def main():
 
 #%% Select file(s) to be processed (download if not present)
     print("===============")
-    fnames = "E:/2P_Kim/06012021 fasted SA-SO test/G1-4/G1-4_Fasted-SA-Session-1/G1-4_Fasted_SA-session1.tif"
+    fnames = "E:/2P_Kim/06012021 fasted SA-SO test/1-5/G1-5-Fasted-Lick-SO/G1-5_Fasted-SO.tif"
     filename = fnames.split("/")[-1]
     print("video loaded")
 #%% First setup some parameters for data and motion correction

@@ -22,6 +22,13 @@ import os
 from caiman.utils.utils import download_demo
 from PIL import Image
 import cv2
+from saveasCSV import saveascsv
+import tkinter as tk
+from tkinter import filedialog  
+
+root = tk.Tk()
+root.withdraw()
+
 
 
 # %% load spatial components and correlation images for each session
@@ -36,20 +43,27 @@ import cv2
 # print(asdfasdf)
 
 # xxx = np.load("testmulti/xxx.npy", allow_pickle=True)
-#xIm = np.array(Image.open('E:/2P_Kim/06012021 fasted SA-SO test/G1-4/G1-4_Fasted-SA-Session-1/STD_G1-4_Fasted_SA-session1.jpg'))
+print("open sesssion 1 representative image")
+ses1_file_path = filedialog.askopenfilename()
+print("open sesssion 2 representative image")
+ses2_file_path = filedialog.askopenfilename()
 
-xIm = cv2.imread("E:/2P_Kim/06012021 fasted SA-SO test/G1-4/G1-4_Fasted-SA-Session-1/MAX_G1-4_Fasted_SA-session1.jpg")
+print("open sesssion 1 spatio footprint")
+ses1_file_path_npz = filedialog.askopenfilename()
+print("open sesssion 2 spatio footprint")
+ses2_file_path_npz = filedialog.askopenfilename()
 
 
-print(type(xIm))
-print(xIm.shape)
 
 
-xxx= scipy.sparse.load_npz("G1-4_Fasted_SO_s2.tif.npz")
 
-#yIm = np.array(Image.open('G1-4_Fasted_SO_s2.png').convert('L'))
+xIm = cv2.imread(ses1_file_path)
 
-yyy = scipy.sparse.load_npz("G1-4_Fasted_SA-session1.tif.npz")
+xxx= scipy.sparse.load_npz(ses1_file_path_npz)
+
+yIm = cv2.imread(ses2_file_path)
+
+yyy = scipy.sparse.load_npz(ses2_file_path_npz)
 
 CI = [np.zeros((512,512)), np.zeros((512,512))]
 
@@ -120,7 +134,7 @@ print("match 2   :  ",match_2.shape)
 print("match12  :   ",match_12)
 
 print(match)
-
+saveascsv('SA-SO-G1-4',match)
 cl = ['y', 'g', 'r']
 labels = ['Both Sessions', 'Session 1 (only)', 'Session 2 (only)']
 
@@ -129,6 +143,17 @@ for mm in masks[0][match_12]:
     id=id+1
     if(id>0):
         plt.imshow(xIm, vmin=lp, vmax=hp, cmap='gray')
-        plt.contour(norm_nrg(mm), levels=[0.95], colors='y', linewidths=1)
-        plt.savefig("testmulti/"+str(id)+".png")
-
+        plt.contour(norm_nrg(mm), levels=[0.95], colors='r', linewidths=1)
+        plt.savefig("testmulti/G1-5/"+str(id)+".png")
+        plt.clf()
+idd=0
+for cell in match_12:
+    idd=idd+1
+    print(cell)
+    index = match[1].index(cell)
+    mm = masks[1][index]
+    plt.imshow(yIm, vmin=lp, vmax=hp, cmap='gray')
+    plt.contour(norm_nrg(mm), levels=[0.95], colors='g', linewidths=1)
+    plt.savefig("testmulti/G1-5/"+str(idd)+"-2.png")
+    plt.clf()
+    
