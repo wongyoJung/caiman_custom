@@ -57,6 +57,7 @@ __pycache__/
 *.tif
 *.png
 *.json
+*.roi
 
 
 

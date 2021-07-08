@@ -49,6 +49,8 @@ from caiman.source_extraction.cnmf import params as params
 from caiman.utils.utils import download_demo
 from caiman.summary_images import local_correlations_movie_offline
 from caiman.utils.custom import saveIndividuals
+from customUtils import saveCSV 
+
 
 # %%
 # Set up the logger (optional); change this if you like.
@@ -67,8 +69,9 @@ def main():
 
 #%% Select file(s) to be processed (download if not present)
     print("===============")
-    fnames = "E:/2P_Kim/06012021 fasted SA-SO test/1-5/G1-5-Fasted-Lick-SO/G1-5_Fasted-SO.tif"
-    filename = fnames.split("/")[-1]
+    # fnames = "E:/2P_Kim/20210621/Image/G1-7 Fasted- SA1/G1-7_Fasted-SA1-0621.tif"
+    fnames = "E:/2P_Kim/20210707/G1-4fed-Dglu30-Gi-T2/G1-4-fed-Dglu-Gi-T2.tif"
+    filename = fnames.split("/")[-1]    
     print("video loaded")
 #%% First setup some parameters for data and motion correction
 
@@ -241,6 +244,7 @@ def main():
     cnm2.estimates.plot_contours(img=Cn, idx=cnm2.estimates.idx_components)
     print(len(cnm2.estimates.idx_components))
     print(len(cnm2.estimates.C))
+
     
     # %% VIEW TRACES (accepted and rejected)
     #if display_images:
@@ -253,6 +257,7 @@ def main():
     print("After select component   :",len(cnm2.estimates.C))
     #%% Extract DF/F values
     cnm2.estimates.detrend_df_f(quantileMin=8, frames_window=250)
+    saveCSV(cnm2.estimates.C,filename)
 
     cells = saveIndividuals(cnm2.estimates.coordinates,cnm2.estimates.C,filename)
     #%% Show final traces

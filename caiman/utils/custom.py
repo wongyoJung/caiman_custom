@@ -22,8 +22,8 @@ def saveIndividuals(coordinates,dFs,filename):
         #cell = individualCell(x,y)
         cells[str(id)]=cell
         id=id+1
-    print(type(cells))
-    print(cells)
+    # print(type(cells))
+    # print(cells)
     with open(filename+".json","w") as f:
         json.dump(cells,f)
 

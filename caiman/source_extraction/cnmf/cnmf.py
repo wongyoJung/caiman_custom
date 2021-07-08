@@ -303,6 +303,7 @@ class CNMF(object):
             self.params = params
             params.set('patch', {'n_processes': n_processes})
 
+
         self.estimates = Estimates(A=Ain, C=Cin, b=b_in, f=f_in,
                                    dims=self.params.data['dims'])
 
