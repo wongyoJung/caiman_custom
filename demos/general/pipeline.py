@@ -241,7 +241,9 @@ def pipeline(fnames):
                                'cnn_lowest': cnn_lowest})
     cnm2.estimates.evaluate_components(images, cnm2.params, dview=dview)
     # %% PLOT COMPONENTS
-    cnm2.estimates.plot_contours(img=Cn, idx=cnm2.estimates.idx_components)
+    cnm2.estimates.plot_contours_woshow(img=Cn, idx=cnm2.estimates.idx_components)
+    plt.close("all")
+
     print(len(cnm2.estimates.idx_components))
     print(len(cnm2.estimates.C))
 
@@ -258,6 +260,7 @@ def pipeline(fnames):
     #%% Extract DF/F values
     cnm2.estimates.detrend_df_f(quantileMin=8, frames_window=250)
     saveCSV(cnm2.estimates.C,filename)
+    plt.close("all")
 
     cells = saveIndividuals(cnm2.estimates.coordinates,cnm2.estimates.C,filename)
     #%% Show final traces
@@ -278,7 +281,7 @@ def pipeline(fnames):
     cnm2.estimates.Cn = Cn
    # cnm2.save(cnm2.mmap_file[:-4] + 'hdf5')//
     #%% reconstruct denoised movie (press q to exit)
-    if True:
+    if False:
         cnm2.estimates.play_movie(images, q_max=99.9, gain_res=2,
                                   magnification=2,
                                   bpx=border_to_0,
