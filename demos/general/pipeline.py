@@ -65,16 +65,12 @@ logging.basicConfig(format=
                     level=logging.WARNING)
 
 #%%
-def main():
+def pipeline(fnames):
     pass  # For compatibility between running under Spyder and the CLI
 
 #%% Select file(s) to be processed (download if not present)
-    print("===============")
-    # fnames = "E:/2P_Kim/20210621/Image/G1-7 Fasted- SA1/G1-7_Fasted-SA1-0621.tif"
-    # fnames = "E:/2P_Kim/20210706/20210706/G1-4fedsalin-trial2(525.1, 70,60, gain5)_30/G1-4-fed-saline-30ul.tif"
-    print("open tif file")
-    fnames = filedialog.askopenfilename()
-    print(fnames)
+    # fnames = filedialog.askopenfilename()
+    # print(fnames)
     filename = fnames.split("/")[-1]  
     print("video loaded")
 #%% First setup some parameters for data and motion correction
@@ -266,6 +262,8 @@ def main():
     cells = saveIndividuals(cnm2.estimates.coordinates,cnm2.estimates.C,filename)
     #%% Show final traces
     cnm2.estimates.view_components(img=Cn,filename=filename)
+    plt.close("all")
+
     print("XXXXXXXXXXXXXXXXXXXXXXX")
     print(type(cnm2.estimates.A))
     # np.save("testmulti/xxx",cnm2.estimates.A)
@@ -285,7 +283,7 @@ def main():
                                   magnification=2,
                                   bpx=border_to_0,
                                   include_bck=False)  # background not shown
-
+    plt.close("all")
     #%% STOP CLUSTER and clean up log files
     cm.stop_server(dview=dview)
     log_files = glob.glob('*_LOG_*')

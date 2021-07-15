@@ -139,6 +139,7 @@ print("match 1   :  ",match_1.shape)
 print("match 2   :  ",match_2.shape)
 print("A size   :   ",A_reg.shape)
 print("match12  :   ",match_12)
+print("ass  :   ",assign)
 
 print(match)
 # saveascsv('SA-SO-G1-7',match)
@@ -150,33 +151,32 @@ for c in match_12:
     ses2 = match[1].index(c)
     ses1_active = Data1[ses1]
     ses2_active = Data2[ses2]
-
     Data1_active.append(ses1_active)
     Data2_active.append(ses2_active)
+    print("c    ;   ",c)
+
 saveascsv("Active_"+filename1,Data1_active)
 saveascsv("Active_"+filename2,Data2_active)
 
 
 
 
-
-
-# id=0
-# for mm in masks[0][match_12]:
-#     id=id+1
-#     if(id>0):
-#         plt.imshow(xIm, vmin=lp, vmax=hp, cmap='gray')
-#         plt.contour(norm_nrg(mm), levels=[0.95], colors='r', linewidths=1)
-#         plt.savefig("testmulti/G1-5/"+str(id)+".png")
-#         plt.clf()
-# idd=0
-# for cell in match_12:
-#     idd=idd+1
-#     print(cell)
-#     index = match[1].index(cell)
-#     mm = masks[1][index]
-#     plt.imshow(yIm, vmin=lp, vmax=hp, cmap='gray')
-#     plt.contour(norm_nrg(mm), levels=[0.95], colors='g', linewidths=1)
-#     plt.savefig("testmulti/G1-5/"+str(idd)+"-2.png")
-#     plt.clf()
+id=0
+for mm in masks[0][match_12]:
+    id=id+1
+    if(id>0):
+        #plt.imshow(xIm, vmin=lp, vmax=hp, cmap='gray')/
+        plt.contour(norm_nrg(mm), levels=[0.95], colors='r', linewidths=1)
+        plt.savefig("testmulti/G1-4-2/"+str(id)+".png")
+        plt.clf()
+idd=0
+for cell in match_12:
+    idd=idd+1
+    print(cell)
+    index = match[1].index(cell)
+    mm = masks[1][index]
+   # plt.imshow(yIm, vmin=lp, vmax=hp, cmap='gray')
+    plt.contour(norm_nrg(mm), levels=[0.95], colors='g', linewidths=1)
+    plt.savefig("testmulti/G1-4-2/"+str(idd)+"-2.png")
+    plt.clf()
     
