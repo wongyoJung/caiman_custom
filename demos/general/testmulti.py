@@ -26,10 +26,22 @@ from saveasCSV import saveascsv,opencsv
 import tkinter as tk
 from tkinter import filedialog  
 import csv
+import sys
 
 root = tk.Tk()
 root.withdraw()
 
+maxInt = sys.maxsize
+
+while True:
+    # decrease the maxInt value by factor 10 
+    # as long as the OverflowError occurs.
+
+    try:
+        csv.field_size_limit(maxInt)
+        break
+    except OverflowError:
+        maxInt = int(maxInt/10)
 
 
 # load spatial components and correlation images for each session
@@ -52,8 +64,7 @@ ses2_file_path = filedialog.askopenfilename()
 print("open sesssion 1 spatio footprint")
 ses1_file_path_npz = filedialog.askopenfilename()
 # ses1_file_path_npz = 'D:/twophoton/CaImAn/demos/general/G1-7-Fasted-SO.tif.npz'
-print("open sesssion 2 spatio footprint")
-ses2_file_path_npz = filedialog.askopenfilename()
+
 # ses2_file_path_npz = 'D:/twophoton/CaImAn/demos/general/G1-7_Fasted-SA1-0621.tif.npz'
 
 print("=================open sesssion 1 calcium traces====================")
@@ -63,6 +74,9 @@ filename1 = ses1_Data.split("/")[-1]
 
 Data1 = opencsv(ses1_Data)
 
+
+print("open sesssion 2 spatio footprint")
+ses2_file_path_npz = filedialog.askopenfilename()
 
 print("=================open sesssion 2 calcium traces====================")
 ses2_Data = filedialog.askopenfilename()
@@ -159,7 +173,10 @@ saveascsv("Active_"+filename1,Data1_active)
 saveascsv("Active_"+filename2,Data2_active)
 
 
-
+if not os.path.exists("testmulti/"+filename1+"/"):
+    os.makedirs("testmulti/"+filename1+"/")
+if not os.path.exists("testmulti/"+filename2+"/"):
+    os.makedirs("testmulti/"+filename2+"/")
 
 id=0
 for mm in masks[0][match_12]:
@@ -167,7 +184,7 @@ for mm in masks[0][match_12]:
     if(id>0):
         #plt.imshow(xIm, vmin=lp, vmax=hp, cmap='gray')/
         plt.contour(norm_nrg(mm), levels=[0.95], colors='r', linewidths=1)
-        plt.savefig("testmulti/G1-4-2/"+str(id)+".png")
+        plt.savefig("testmulti/"+filename1+"/"+str(id)+".png")
         plt.clf()
 idd=0
 for cell in match_12:
@@ -177,6 +194,6 @@ for cell in match_12:
     mm = masks[1][index]
    # plt.imshow(yIm, vmin=lp, vmax=hp, cmap='gray')
     plt.contour(norm_nrg(mm), levels=[0.95], colors='g', linewidths=1)
-    plt.savefig("testmulti/G1-4-2/"+str(idd)+"-2.png")
+    plt.savefig("testmulti/"+filename2+"/"+str(idd)+".png")
     plt.clf()
     

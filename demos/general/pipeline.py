@@ -76,7 +76,7 @@ def pipeline(fnames):
 #%% First setup some parameters for data and motion correction
 
     # dataset dependent parameters
-    fr = 5             # imaging rate in frames per second
+    fr = 7.5             # imaging rate in frames per second
     decay_time = 0.6   # length of a typical transient in seconds
     dxy = (2., 2.)      # spatial resolution in x and y in (um per pixel)
     # note the lower than usual spatial resolution here
