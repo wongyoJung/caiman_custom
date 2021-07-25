@@ -76,7 +76,7 @@ def pipeline(fnames):
 #%% First setup some parameters for data and motion correction
 
     # dataset dependent parameters
-    fr = 7.5             # imaging rate in frames per second
+    fr = 5            # imaging rate in frames per second
     decay_time = 0.6   # length of a typical transient in seconds
     dxy = (2., 2.)      # spatial resolution in x and y in (um per pixel)
     # note the lower than usual spatial resolution here
@@ -281,10 +281,12 @@ def pipeline(fnames):
     cnm2.estimates.Cn = Cn
    # cnm2.save(cnm2.mmap_file[:-4] + 'hdf5')//
     #%% reconstruct denoised movie (press q to exit)
-    if False:
+    if True:
         cnm2.estimates.play_movie(images, q_max=99.9, gain_res=2,
                                   magnification=2,
                                   bpx=border_to_0,
+                                  save_movie=True,
+                                  movie_name=filename+".mp4",
                                   include_bck=False)  # background not shown
     plt.close("all")
     #%% STOP CLUSTER and clean up log files
