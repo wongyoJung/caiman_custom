@@ -67,11 +67,7 @@ logging.basicConfig(format=
 #%%
 def main():
     pass  # For compatibility between running under Spyder and the CLI
-
-#%% Select file(s) to be processed (download if not present)
-    print("===============")
-    # fnames = "E:/2P_Kim/20210621/Image/G1-7 Fasted- SA1/G1-7_Fasted-SA1-0621.tif"
-    # fnames = "E:/2P_Kim/20210706/20210706/G1-4fedsalin-trial2(525.1, 70,60, gain5)_30/G1-4-fed-saline-30ul.tif"
+#   WG : Select files from the window file explorer
     print("open tif file")
     fnames = filedialog.askopenfilename()
     print(fnames)
@@ -80,7 +76,9 @@ def main():
 #%% First setup some parameters for data and motion correction
 
     # dataset dependent parameters
+    # WG : we are using 5Hz video 
     fr = 5             # imaging rate in frames per second
+    ## WG : increased the decay time since we used GCaMP6s
     decay_time = 0.6   # length of a typical transient in seconds
     dxy = (2., 2.)      # spatial resolution in x and y in (um per pixel)
     # note the lower than usual spatial resolution here
@@ -136,14 +134,6 @@ def main():
 # %% Run (piecewise-rigid motion) correction using NoRMCorre
     mc.motion_correct(save_movie=True)
     print("motion correction ended")
-# %% compare with original movie
-    # if display_images:
-    #     m_orig = cm.load_movie_chain(fnames)
-    #     m_els = cm.load(mc.mmap_file)
-    #     ds_ratio = 0.2
-    #     moviehandle = cm.concatenate([m_orig.resize(1, 1, ds_ratio) - mc.min_mov*mc.nonneg_movie,
-    #                                   m_els.resize(1, 1, ds_ratio)], axis=2)
-    #     moviehandle.play(fr=60, q_max=99.5, magnification=2)  # press q to exit
 
 # %% MEMORY MAPPING
     border_to_0 = 0 if mc.border_nan == 'copy' else mc.border_to_0
@@ -170,10 +160,14 @@ def main():
     gnb = 2                  # number of global background components
     merge_thr = 0.85         # merging threshold, max correlation allowed
     rf = 30
+    # WG : we increased the half-size of patches, since the hypothalamic nuerons are bigger than cortex neurons
+    
     # half-size of the patches in pixels. e.g., if rf=25, patches are 50x50
     stride_cnmf = 6          # amount of overlap between the patches in pixels
     K = 4                    # number of components per patch
     gSig = [7,7]            # expected half size of neurons in pixels
+    # WG : increased the expected size of neurons
+
     # initialization method (if analyzing dendritic data using 'sparse_nmf')
     method_init = 'greedy_roi'
     ssub = 2                     # spatial subsampling during initialization
@@ -218,9 +212,7 @@ def main():
                                            dview=dview)
     Cn = Cns.max(axis=0)
     Cn[np.isnan(Cn)] = 0
-    # cnm.estimates.plot_contours(img=Cn)
-    # plt.title('Contour plots of found components')
-    # plt.savefig("contours of cells")
+
 #%% save results
     cnm.estimates.Cn = Cn
     # cnm.save(fname_new[:-5]+'_init.hdf5')
@@ -246,19 +238,10 @@ def main():
     cnm2.estimates.evaluate_components(images, cnm2.params, dview=dview)
     # %% PLOT COMPONENTS
     cnm2.estimates.plot_contours(img=Cn, idx=cnm2.estimates.idx_components)
-    print(len(cnm2.estimates.idx_components))
-    print(len(cnm2.estimates.C))
 
-    
-    # %% VIEW TRACES (accepted and rejected)
-    #if display_images:
-    #    cnm2.estimates.view_components(images, img=Cn,
-    #                                  idx=cnm2.estimates.idx_components)
-    #    cnm2.estimates.view_components(images, img=Cn,
-     #                                 idx=cnm2.estimates.idx_components_   bad)
+
     #%% update object with selected components
     cnm2.estimates.select_components(use_object=True)
-    print("After select component   :",len(cnm2.estimates.C))
     #%% Extract DF/F values
     cnm2.estimates.detrend_df_f(quantileMin=8, frames_window=250)
     saveCSV(cnm2.estimates.C,filename)
@@ -266,25 +249,22 @@ def main():
     cells = saveIndividuals(cnm2.estimates.coordinates,cnm2.estimates.C,filename)
     #%% Show final traces
     cnm2.estimates.view_components(img=Cn,filename=filename)
-    print("XXXXXXXXXXXXXXXXXXXXXXX")
-    print(type(cnm2.estimates.A))
-    # np.save("testmulti/xxx",cnm2.estimates.A)
-    #scipy.io.mmwrite("test.mtx",  cnm2.estimates.A)
+
 
     scipy.sparse.save_npz(filename+'.npz', cnm2.estimates.A)
-    print("XXXXXXXXXXXXXXXXXXXXXXX")
-
-
+    ## WG : save the spatial footprint(ROIs) into npz, for the multi-regristration
 
     #%%
     cnm2.estimates.Cn = Cn
-   # cnm2.save(cnm2.mmap_file[:-4] + 'hdf5')//
-    #%% reconstruct denoised movie (press q to exit)
+
     if True:
         cnm2.estimates.play_movie(images, q_max=99.9, gain_res=2,
                                   magnification=2,
                                   bpx=border_to_0,
+                                  save_movie=True,
+                                  movie_name=filename+".mp4",
                                   include_bck=False)  # background not shown
+    ## WG : save the reconstructed video 
 
     #%% STOP CLUSTER and clean up log files
     cm.stop_server(dview=dview)

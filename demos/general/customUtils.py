@@ -1,5 +1,8 @@
 import csv
 import numpy as np
+"""
+ this code is for the one-click GUI analysis
+ """
 
 def saveCSV(data,filename):
     with open(filename+'.csv', 'w', newline='') as file:
