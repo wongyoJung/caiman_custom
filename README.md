@@ -4,7 +4,7 @@ CaImAn
 # CUSTOMIZED algorithm
 ## 1. demo_union.py
 script for the overall pipeline for motion correction and cnmf for each images
-  ###(1) motion correction: used customized parameters 
+  ### a. motion correction: used customized parameters 
   - customized parameters
     - WG : we are using 5Hz video 
     fr = 5            
@@ -24,7 +24,7 @@ script for the overall pipeline for motion correction and cnmf for each images
     - maximum deviation allowed for patch with respect to rigid shifts
     max_deviation_rigid = 3
     
-  ###(2) cnmf
+  ### b. cnmf
   - customized parameters
       p = 1                    # order of the autoregressive system
       gnb = 2                  # number of global background components
@@ -41,8 +41,8 @@ script for the overall pipeline for motion correction and cnmf for each images
       method_init = 'greedy_roi'
       ssub = 2                     # spatial subsampling during initialization
       tsub = 2                     # temporal subsampling during intialization
-   ###(3) saveCSV(cnm2.estimates.C,filename) : save the raw calcium trace from CNMF into CSV file
-   ###(4)   scipy.sparse.save_npz(filename+'.npz', cnm2.estimates.A) : save the spaiofootprint of each cells into .npz file
+   ### c.  saveCSV(cnm2.estimates.C,filename) : save the raw calcium trace from CNMF into CSV file
+   ### d.   scipy.sparse.save_npz(filename+'.npz', cnm2.estimates.A) : save the spaiofootprint of each cells into .npz file
 
 
 2. testmulti.py
