@@ -6,22 +6,22 @@ CaImAn
 script for the overall pipeline for motion correction and cnmf for each images
   1) motion correction: used customized parameters 
   - customized parameters
-      # WG : we are using 5Hz video 
+    - WG : we are using 5Hz video 
     fr = 5            
-    ## WG : increased the decay time since we used GCaMP6s
+    - WG : increased the decay time since we used GCaMP6s
     decay_time = 0.6   
     dxy = (2., 2.)      
     max_shift_um = (12., 12.)      
     patch_motion_um = (100., 100.) 
-    # motion correction parameters
+    - motion correction parameters
     pw_rigid = True       # flag to select rigid vs pw_rigid motion correction
-    # maximum allowed rigid shift in pixels
+    - maximum allowed rigid shift in pixels
     max_shifts = [int(a/b) for a, b in zip(max_shift_um, dxy)]
-    # start a new patch for pw-rigid motion correction every x pixels
+    - start a new patch for pw-rigid motion correction every x pixels
     strides = tuple([int(a/b) for a, b in zip(patch_motion_um, dxy)])
-    # overlap between pathes (size of patch in pixels: strides+overlaps)
+    - overlap between pathes (size of patch in pixels: strides+overlaps)
     overlaps = (24, 24)
-    # maximum deviation allowed for patch with respect to rigid shifts
+    - maximum deviation allowed for patch with respect to rigid shifts
     max_deviation_rigid = 3
     
   2) cnmf
@@ -30,15 +30,14 @@ script for the overall pipeline for motion correction and cnmf for each images
       gnb = 2                  # number of global background components
       merge_thr = 0.85         # merging threshold, max correlation allowed
       rf = 30
-      # WG : we increased the half-size of patches, since the hypothalamic nuerons are bigger than cortex neurons
+      - WG : we increased the half-size of patches, since the hypothalamic nuerons are bigger than cortex neurons
       
-      # half-size of the patches in pixels. e.g., if rf=25, patches are 50x50
       stride_cnmf = 6          # amount of overlap between the patches in pixels
       K = 4                    # number of components per patch
       gSig = [7,7]            # expected half size of neurons in pixels
-      # WG : increased the expected size of neurons
+      - WG : increased the expected size of neurons
 
-      # initialization method (if analyzing dendritic data using 'sparse_nmf')
+      - initialization method (if analyzing dendritic data using 'sparse_nmf')
       method_init = 'greedy_roi'
       ssub = 2                     # spatial subsampling during initialization
       tsub = 2                     # temporal subsampling during intialization
