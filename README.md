@@ -6,6 +6,7 @@ CaImAn
 script for the overall pipeline for motion correction and cnmf for each images
   ### a. motion correction: used customized parameters 
   - customized parameters
+  ```
     - WG : we are using 5Hz video 
     fr = 5            
     - WG : increased the decay time since we used GCaMP6s
@@ -23,9 +24,11 @@ script for the overall pipeline for motion correction and cnmf for each images
     overlaps = (24, 24)
     - maximum deviation allowed for patch with respect to rigid shifts
     max_deviation_rigid = 3
+  ```
     
   ### b. cnmf
   - customized parameters
+  ```
       p = 1                    # order of the autoregressive system
       gnb = 2                  # number of global background components
       merge_thr = 0.85         # merging threshold, max correlation allowed
@@ -40,40 +43,54 @@ script for the overall pipeline for motion correction and cnmf for each images
       method_init = 'greedy_roi'
       ssub = 2                     # spatial subsampling during initialization
       tsub = 2                     # temporal subsampling during intialization
-   ### c.  saveCSV(cnm2.estimates.C,filename) : save the raw calcium trace from CNMF into CSV file
-   ### d.   scipy.sparse.save_npz(filename+'.npz', cnm2.estimates.A) : save the spaiofootprint of each cells into .npz file
+   ```
+   ### c. save the raw calcium trace from CNMF into CSV file
+ ```
+  saveCSV(cnm2.estimates.C,filename) : 
+  ```
+  
+   ### d.  save the spaiofootprint of each cells into .npz file
+   ``` 
+    scipy.sparse.save_npz(filename+'.npz', cnm2.estimates.A) :
+   ```
 
 
-2. testmulti.py
+## 2. testmulti.py
 compare pair of ROIs from two sessions and take common ROIs and calcium traces from that common ROIs from each sessions
-  1) take the common ROIs from given Caiman function
+  ### a) take the common ROIs from given Caiman function
+ ```
+
       match_1 = extract_active_components(assign, [0], only=False)
       match_2 = extract_active_components(assign, [1], only=False)
       match_12 = extract_active_components(assign, [0, 1], only=False)
+  ```
 
-  2) save calcium traces from common ROIs in each session into new csv files
+
+  ### b) save calcium traces from common ROIs in each session into new csv files
   
     saveascsv("Active_"+filename1,Data1_active)
     saveascsv("Active_"+filename2,Data2_active)
 
-  3) save the common ROIs image into PNG file
-    id=0
-    for mm in masks[0][match_12]:
-        id=id+1
-        if(id>0):
-            plt.contour(norm_nrg(mm), levels=[0.95], colors='r', linewidths=1)
-            plt.savefig("testmulti/"+filename1+"/"+str(id)+".png")
-            plt.clf()
-    idd=0
-    for cell in match_12:
-        idd=idd+1
-        print(cell)
-        index = match[1].index(cell)
-        mm = masks[1][index]
-        plt.contour(norm_nrg(mm), levels=[0.95], colors='g', linewidths=1)
-        plt.savefig("testmulti/"+filename2+"/"+str(idd)+".png")
-        plt.clf()
-        
+  ### c) save the common ROIs image into PNG file
+```
+      id=0
+      for mm in masks[0][match_12]:
+          id=id+1
+          if(id>0):
+              plt.contour(norm_nrg(mm), levels=[0.95], colors='r', linewidths=1)
+              plt.savefig("testmulti/"+filename1+"/"+str(id)+".png")
+              plt.clf()
+      idd=0
+      for cell in match_12:
+          idd=idd+1
+          print(cell)
+          index = match[1].index(cell)
+          mm = masks[1][index]
+          plt.contour(norm_nrg(mm), levels=[0.95], colors='g', linewidths=1)
+          plt.savefig("testmulti/"+filename2+"/"+str(idd)+".png")
+          plt.clf()
+```
+
 
 
 
