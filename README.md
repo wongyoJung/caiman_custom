@@ -1,5 +1,8 @@
 CaImAn
 ======
+for the analyze, we use 
+1. demo_union.py for motion correction and cnmf from each imaging video 
+2. testmulti.py for comparison of ROIs from pair of sessions
 
 # CUSTOMIZED algorithm
 ## 1. demo_union.py
