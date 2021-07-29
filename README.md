@@ -36,7 +36,6 @@ script for the overall pipeline for motion correction and cnmf for each images
       K = 4                    # number of components per patch
       gSig = [7,7]            # expected half size of neurons in pixels
       - WG : increased the expected size of neuro
-
       - initialization method (if analyzing dendritic data using 'sparse_nmf')
       method_init = 'greedy_roi'
       ssub = 2                     # spatial subsampling during initialization
