@@ -4,6 +4,8 @@ for the analyze, we use
 1. demo_union.py for motion correction and cnmf from each imaging video 
 2. testmulti.py for comparison of ROIs from pair of sessions
 
+### 카이만에서 제공되었던 기본 예제 pipeline에서 저희가 추가로 변경한 코드라인에 대해서는 WG로 시작하는 커멘트를 넣어두었습니다. 
+
 # CUSTOMIZED algorithm
 ## 1. demo_union.py
 script for the overall pipeline for motion correction and cnmf for each images
